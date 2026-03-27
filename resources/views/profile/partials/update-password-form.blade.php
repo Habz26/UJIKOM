@@ -13,36 +13,46 @@
         @csrf
         @method('put')
 
-        <div>
-            <x-input-label class="text-yellow-900" for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500 rounded-md shadow-sm" autocomplete="current-password" />
-            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
+
+    <form method="post" action="{{ route('password.update') }}" class="space-y-4">
+        @csrf
+        @method('put')
+
+        <div class="mb-4">
+            <label class="form-label fw-bold fs-5" for="update_password_current_password">Password Saat Ini</label>
+            <input id="update_password_current_password" name="current_password" type="password" class="form-control form-control-lg @error('current_password', 'updatePassword') is-invalid @enderror" autocomplete="current-password" />
+            @error('current_password', 'updatePassword')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div>
-            <x-input-label class="text-yellow-900" for="update_password_password" :value="__('New Password')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500 rounded-md shadow-sm" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
+        <div class="mb-4">
+            <label class="form-label fw-bold fs-5" for="update_password_password">Password Baru</label>
+            <input id="update_password_password" name="password" type="password" class="form-control form-control-lg @error('password', 'updatePassword') is-invalid @enderror" autocomplete="new-password" />
+            @error('password', 'updatePassword')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div>
-            <x-input-label class="text-yellow-900" for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500 rounded-md shadow-sm" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
+        <div class="mb-4">
+            <label class="form-label fw-bold fs-5" for="update_password_password_confirmation">Konfirmasi Password</label>
+            <input id="update_password_password_confirmation" name="password_confirmation" type="password" class="form-control form-control-lg @error('password_confirmation', 'updatePassword') is-invalid @enderror" autocomplete="new-password" />
+            @error('password_confirmation', 'updatePassword')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-secondary-button>{{ __('Save') }}</x-secondary-button>
-
+        <div class="d-flex gap-3 justify-content-end">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-check-circle me-2"></i> Simpan Password
+            </button>
             @if (session('status') === 'password-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-yellow-600"
-                >{{ __('Saved.') }}</p>
+                <p class="align-self-end mb-0 text-success fw-bold" x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)">
+                    <i class="bi bi-check-circle-fill me-1"></i> Password disimpan!
+                </p>
             @endif
         </div>
+    </form>
+
     </form>
 </section>

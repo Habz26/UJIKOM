@@ -13,30 +13,33 @@
         @csrf
         @method('patch')
 
-        <div>
-            <x-input-label for="role" :value="__('Role')" class="text-yellow-900" />
-            <select id="role" name="role" class="block mt-1 w-full border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500 rounded-md shadow-sm">
+
+    <form method="post" action="{{ route('role.update') }}" class="space-y-4">
+        @csrf
+        @method('patch')
+
+        <div class="mb-4">
+            <label class="form-label fw-bold fs-5" for="role">Role</label>
+            <select id="role" name="role" class="form-select form-select-lg @error('role') is-invalid @enderror">
                 <option value="user" {{ auth()->user()->role === 'user' ? 'selected' : '' }}>User</option>
                 <option value="admin" {{ auth()->user()->role === 'admin' ? 'selected' : '' }}>Admin</option>
             </select>
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+            @error('role')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-secondary-button>
-                {{ __('Update Role') }}
-            </x-secondary-button>
-
+        <div class="d-flex gap-3 justify-content-end">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-person-badge me-2"></i> Update Role
+            </button>
             @if (session('status') === 'Role updated successfully!')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-yellow-600"
-                >{{ session('status') }}</p>
-                
+                <p class="align-self-end mb-0 text-success fw-bold" x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)">
+                    <i class="bi bi-check-circle-fill me-1"></i> Role updated!
+                </p>
             @endif
         </div>
+    </form>
+
     </form>
 </section>

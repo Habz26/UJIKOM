@@ -15,6 +15,9 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
+                        {{ __('Data Buku') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -37,6 +40,7 @@
                         <x-dropdown-link :href="route('profile.edit')" class="font-medium text-yellow-800 hover:text-yellow-900">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}" >
