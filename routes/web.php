@@ -24,10 +24,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('books', BookController::class);
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
     Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
-    Route::patch('/loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+    Route::get('/loans/active', [LoanController::class, 'active'])->name('loans.active');
     Route::get('/history', [LoanController::class, 'history'])->name('loans.history');
+    Route::patch('/loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+    Route::patch('/loans/{loan}/condition', [LoanController::class, 'updateCondition'])->name('loans.update-condition');
+    
 
 });
+
+
 
 Route::get('/admin', function () {
     return 'Admin Only';

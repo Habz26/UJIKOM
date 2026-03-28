@@ -52,10 +52,17 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            function highlight($text, $term) {
+                                if (!$term) return $text;
+                                $pattern = '/(' . preg_quote($term, '/') . ')/i';
+                                return preg_replace($pattern, '<mark class="bg-warning text-dark fw-bold">$1</mark>', $text);
+                            }
+                        @endphp
                         @forelse($books as $book)
                         <tr>
-                            <td>{{ Str::limit($book->title, 40) }}</td>
-                            <td>{{ Str::limit($book->author, 30) }}</td>
+                            <td>{!! highlight(Str::limit($book->title, 40), $search ?? '') !!}</td>
+                            <td>{!! highlight(Str::limit($book->author, 30), $search ?? '') !!}</td>
                             <td>{{ $book->year }}</td>
                             <td>
                                 <span class="badge {{ $book->stock > 0 ? 'bg-success' : 'bg-danger' }}">

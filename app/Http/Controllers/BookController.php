@@ -24,9 +24,10 @@ class BookController extends Controller
                   ->orWhere('author', 'like', "%{$search}%");
         }
         
+        $search = $request->get('search');
         $books = $query->latest()->paginate(10);
         
-        return view('books.index', compact('books'));
+        return view('books.index', compact('books', 'search'));
     }
 
     /**

@@ -25,14 +25,16 @@ class LoanController extends Controller
      */
     public function store(StoreLoanRequest $request): RedirectResponse
     {
-        $loan = Loan::create($request->validated());
+$loanData = $request->validated();
+        
+        $loan = Loan::create($loanData);
         
         // Update book stock
         $book = Book::find($request->book_id);
         $book->decrement('stock');
         
-        return redirect()->route('loans.history')
-            ->with('success', 'Peminjaman berhasil dicatat!');
+        return redirect()->route('loans.active')
+            ->with('success', 'Peminjaman berhasil dicatat! Jatuh tempo: ' . $loan->due_date->format('d/m/Y'));
     }
 
 
@@ -45,27 +47,80 @@ class LoanController extends Controller
             return back()->with('error', 'Peminjaman sudah dikembalikan.');
         }
 
+        $dueDate = $loan->due_date ?? $loan->loan_date->copy()->addDays(7);
+        $isOverdue = now()->gt($dueDate);
+        $lateNote = $isOverdue ? ' (TERLAMBAT ' . now()->diffInDays($dueDate) . ' hari)' : '';
+
         $loan->update([
-            'return_date' => now(),
+            'returned_at' => now(),
             'status' => 'dikembalikan'
         ]);
 
         $loan->book->increment('stock');
 
-        return back()->with('success', 'Buku berhasil dikembalikan!');
+        return back()->with('success', 'Buku berhasil dikembalikan!' . $lateNote);
     }
 
     /**
-     * Show loan history.
+     * Show active loans (dipinjam).
+     */
+    public function active(Request $request): View
+    {
+        $overdueLoans = Loan::where('status', 'dipinjam')
+            ->where('loan_date', '<=', now()->subDays(7))
+            ->count();
+
+        $query = Loan::with('book')
+            ->where('status', 'dipinjam')
+            ->when($request->filled('status') && $request->status === 'terlambat', function ($q) {
+                $q->where('loan_date', '<=', now()->subDays(7));
+            })
+            ->latest();
+        
+        $loans = $query->paginate(10);
+        
+        return view('loans.active', compact('loans', 'overdueLoans'));
+    }
+
+    /**
+     * Show completed history (dikembalikan).
      */
     public function history(Request $request): View
     {
-        $query = Loan::with('book')->latest();
+        $query = Loan::with('book')
+            ->where('status', 'dikembalikan')
+            ->latest();
         
         $loans = $query->paginate(10);
         
         return view('loans.history', compact('loans'));
     }
+
+    /**
+     * Update loan condition/damage report.
+     */
+    public function updateCondition(Request $request, Loan $loan): RedirectResponse
+    {
+        $request->validate([
+            'condition' => 'required|in:baik,rusak',
+            'damage_note' => 'nullable|string|max:500'
+        ]);
+
+        $loan->update([
+            'condition' => $request->condition,
+            'damage_note' => $request->damage_note,
+            'returned_at' => now(),
+            'status' => 'dikembalikan'
+        ]);
+
+        $loan->book->increment('stock');
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Kondisi buku berhasil diupdate & dikembalikan!');
+    }
 }
+
+
+
 
 

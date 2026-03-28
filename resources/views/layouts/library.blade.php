@@ -112,13 +112,18 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link text-white @if(request()->routeIs('loans.active'))active @endif" href="{{ route('loans.active') }}">
+                    <i class="bi bi-clock fs-5 me-3"></i> Pinjaman Aktif
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-white @if(request()->routeIs('loans.history'))active @endif" href="{{ route('loans.history') }}">
                     <i class="bi bi-clock-history fs-5 me-3"></i> Riwayat
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white @if(request()->routeIs('profile.edit'))active @endif" href="{{ route('profile.edit') }}">
-                    <i class="bi bi-people fs-5 me-3"></i> Data Pengguna
+                    <i class="bi bi-gear fs-5 me-3"></i> Pengaturan
                 </a>
             </li>
         </ul>
