@@ -2,9 +2,6 @@
     @csrf
     @method('patch')
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
 
     <div class="mb-4">
         <label class="form-label fw-bold fs-5">Nama</label>
@@ -27,7 +24,7 @@
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     Email Anda belum terverifikasi.
                 </p>
-                <button form="send-verification" class="btn btn-outline-warning btn-sm">
+        <button type="button" class="btn btn-outline-warning btn-sm" onclick="document.getElementById('send-verification').submit();">
                     <i class="bi bi-arrow-repeat me-1"></i>Kirim ulang verifikasi
                 </button>
 
@@ -44,10 +41,11 @@
         <button type="submit" class="btn btn-primary btn-lg px-5">
             <i class="bi bi-check-circle me-2"></i> Simpan
         </button>
-        @if (session('status') === 'profile-updated')
-            <p class="align-self-end mb-0 text-success fw-bold" x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)">
-                <i class="bi bi-check-circle-fill me-1"></i> Disimpan!
-            </p>
-        @endif
     </div>
+    
+@if (session('status') === 'profile-updated')
+    <div class="alert alert-success mt-3">
+        <i class="bi bi-check-circle-fill me-1"></i> Disimpan!
+    </div>
+@endif
 </form>

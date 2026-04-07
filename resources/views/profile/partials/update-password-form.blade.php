@@ -9,11 +9,6 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('put')
-
-
     <form method="post" action="{{ route('password.update') }}" class="space-y-4">
         @csrf
         @method('put')
@@ -46,13 +41,11 @@
             <button type="submit" class="btn btn-primary btn-lg px-5">
                 <i class="bi bi-check-circle me-2"></i> Simpan Password
             </button>
-            @if (session('status') === 'password-updated')
-                <p class="align-self-end mb-0 text-success fw-bold" x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)">
+@if (session('status') === 'password-updated')
+                <div class="alert alert-success mt-2 mb-0">
                     <i class="bi bi-check-circle-fill me-1"></i> Password disimpan!
-                </p>
+                </div>
             @endif
         </div>
-    </form>
-
     </form>
 </section>

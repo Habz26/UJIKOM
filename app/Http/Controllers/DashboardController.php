@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-$topBooks = Book::select('title')
+        $topBooks = Book::select('title')
             ->withCount('loans as loan_count')
             ->orderByDesc('loan_count')
             ->limit(5)
@@ -30,9 +30,11 @@ $topBooks = Book::select('title')
             'overdue_count' => Loan::where('return_date', '<', now())
                 ->where('status', '!=', 'dikembalikan')
                 ->count(),
+            'due_today_count' => Loan::whereDate('return_date', now())
+                ->where('status', 'dipinjam')
+                ->count(),
         ];
 
         return view('dashboard', compact('stats', 'topBooks', 'activeLoans'));
     }
 }
-

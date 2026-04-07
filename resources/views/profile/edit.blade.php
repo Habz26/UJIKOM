@@ -26,11 +26,6 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="role-tab" data-bs-toggle="tab" data-bs-target="#role-tab-pane" type="button" role="tab">
-                                <i class="bi bi-person-badge me-1"></i> Role
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-tab-pane" type="button" role="tab">
                                 <i class="bi bi-trash me-1"></i> Delete Account
                             </button>
@@ -44,9 +39,6 @@
                         </div>
                         <div class="tab-pane fade" id="password-tab-pane" role="tabpanel">
                             @include('profile.partials.update-password-form')
-                        </div>
-                        <div class="tab-pane fade" id="role-tab-pane" role="tabpanel">
-                            @include('profile.partials.update-role-form')
                         </div>
                         <div class="tab-pane fade" id="delete-tab-pane" role="tabpanel">
                             @include('profile.partials.delete-user-form')

@@ -1,17 +1,15 @@
-# Style Profile Forms to Match Books
+# TODO: Redesign Login/Register + Home Route
 
-Status: [x] Complete
+## Plan Status: Completed
 
-## Changes:
-1. [x] profile/edit.blade.php: library layout + Bootstrap tabs with icons (Info, Password, Role, Delete)
-2. [x] update-profile-information-form.blade.php: Bootstrap forms, localized labels, warning box for unverified email
-3. [x] update-password-form.blade.php: Bootstrap lg inputs/buttons, error bags, localized
-4. [x] update-role-form.blade.php: form-select-lg, validation errors
-5. [x] delete-user-form.blade.php: Bootstrap modal with danger theme, password confirm
+### Steps:
+- [x] 1. Create TODO file ✅
+- [x] 2. Update layouts/guest.blade.php to Bootstrap library style ✅
+- [x] 3. Update auth/login.blade.php to Bootstrap matching style ✅
+- [x] 4. Update auth/register.blade.php to Bootstrap matching style ✅
+- [x] 5. Edit routes/web.php home to login ✅
+- [x] 6. Complete ✅
 
-- All Tailwind/x-components replaced with Bootstrap equivalents (form-control-lg, btn-primary-lg, invalid-feedback).
-- Preserved Alpine toasts, verification logic, @error bags.
-- Localized Indonesian labels/buttons matching app.
-- Matches books styling: fw-bold fs-5 labels, px-5 lg buttons, icons.
+All updated. Test with `php artisan serve`, visit / redirects to login, design consistent.
 
-**Test:** Visit `/profile/edit` - tabs navigate, forms submit with validation/modals.
+- [ ]

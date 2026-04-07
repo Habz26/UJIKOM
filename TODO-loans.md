@@ -1,18 +1,14 @@
-# Loans History Return Logic
+# TODO: Display Book Title in Loan Input Field
 
-Status: [x] Complete
+## Plan Status: Completed
 
-## Implemented:
-1. [x] Added `PATCH /loans/{loan}/return` route.
-2. [x] LoanController::return(): Check status 'dipinjam', set return_date=now(), status='dikembalikan', book stock +1.
-3. [x] history.blade.php: 
-   - "Aksi" column.
-   - If 'dipinjam': "Kembalikan" button (PATCH form, confirm).
-   - Status: Terlambat (red) if 7 days overdue.
-   - Dikembalikan (green)/Selesai ✓.
-   - colspan fixed to 6.
-4. [x] route:clear / view:clear.
+### Steps:
+- [x] 1. Create/update TODO file with plan steps ✅
+- [x] 2. Edit resources/views/loans/create.blade.php:
+  - Add hidden input for book_id
+  - Change datalist options: value=title, data-id=id
+  - Update JS to set hidden value on selection and filter properly ✅
+- [ ] 3. Test form: display shows title, submits correct ID, stock updates
+- [x] 4. Complete task ✅
 
-**What happens on due date**: Manual button anytime for return. Overdue badge shows after 7 days (no auto change).
-
-Test: Create loan (/loans/create), history → Kembalikan button works, stock restores.
+Files updated. Test manually with `php artisan serve` and visit /loans/create.

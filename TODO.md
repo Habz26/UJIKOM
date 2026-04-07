@@ -1,12 +1,10 @@
-# TODO: Add Search Highlight
+# TODO: Fix Mobile Hamburger Navigation
 
-## Steps to complete:
-- [x] Step 1: Update BookController.php to pass $search to view
-- [x] Step 2: Update resources/views/books/index.blade.php to add highlight function and apply to title/author cells
-- [x] Step 1: Update BookController.php to pass $search to view
-- [x] Step 2: Update resources/views/books/index.blade.php to add highlight function and apply to title/author cells
-- [x] Step 3: Test the implementation
-- [x] Step 4: Complete task
-
-**Task completed:** Search highlighting successfully added to books page.
+## Steps:
+- [x] 1. Add CSS for sidebar overlay and improved mobile styles
+- [x] 2. Insert HTML overlay div after sidebar-toggle button
+- [x] 3. Update JS toggleSidebar() function with overlay and scroll lock
+- [ ] 1-4. Previous edits (reopen for fix)
+- [x] 5. Rebuild assets
+- [ ] 6. Test & additional fixes for visibility
 

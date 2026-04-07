@@ -34,32 +34,38 @@ $loanData = $request->validated();
         $book->decrement('stock');
         
         return redirect()->route('loans.active')
-            ->with('success', 'Peminjaman berhasil dicatat! Jatuh tempo: ' . $loan->due_date->format('d/m/Y'));
+            ->with('success', 'Peminjaman berhasil dicatat! Jatuh tempo: ' . $loan->return_date->format('d/m/Y'));
     }
 
 
     /**
      * Return loan (early or due).
      */
-    public function return(Loan $loan): RedirectResponse
-    {
-        if ($loan->status !== 'dipinjam') {
-            return back()->with('error', 'Peminjaman sudah dikembalikan.');
-        }
-
-        $dueDate = $loan->due_date ?? $loan->loan_date->copy()->addDays(7);
-        $isOverdue = now()->gt($dueDate);
-        $lateNote = $isOverdue ? ' (TERLAMBAT ' . now()->diffInDays($dueDate) . ' hari)' : '';
-
-        $loan->update([
-            'returned_at' => now(),
-            'status' => 'dikembalikan'
-        ]);
-
-        $loan->book->increment('stock');
-
-        return back()->with('success', 'Buku berhasil dikembalikan!' . $lateNote);
+public function return(Loan $loan): RedirectResponse
+{
+    if ($loan->status !== 'dipinjam') {
+        return back()->with('error', 'Peminjaman sudah dikembalikan.');
     }
+
+    $dueDate = $loan->return_date ?? $loan->loan_date->copy()->addDays(7);
+    $isOverdue = now()->gt($dueDate);
+
+    $lateDays = 0;
+    if ($isOverdue) {
+        $lateDays = floor($dueDate->diffInSeconds(now()) / 86400);
+    }
+
+    $lateNote = $lateDays > 0 ? ' (TERLAMBAT ' . $lateDays . ' hari)' : '';
+
+    $loan->update([
+        'returned_at' => now(),
+        'status' => 'dikembalikan'
+    ]);
+
+    $loan->book->increment('stock');
+
+    return back()->with('success', 'Buku berhasil dikembalikan!' . $lateNote);
+}
 
     /**
      * Show active loans (dipinjam).
@@ -115,7 +121,7 @@ $loanData = $request->validated();
 
         $loan->book->increment('stock');
 
-        return redirect()->route('dashboard')
+        return redirect()->route('loans.history')
             ->with('success', 'Kondisi buku berhasil diupdate & dikembalikan!');
     }
 }

@@ -8,16 +8,30 @@
             <i class="bi bi-house-door me-2"></i> Dashboard
         </h2>
 
-        {{-- Quick Actions --}}
-        @if (($stats['overdue_count'] ?? 0) > 0)
-            <div class="alert alert-danger mb-4">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong>{{ $stats['overdue_count'] }} pinjaman terlambat!</strong>
-                Periksa dan tindak lanjuti segera.
-                <a href="{{ route('loans.active') }}?status=dipinjam" class="alert-link">
-                    Lihat Detail
-                </a>
-            </div>
+        {{-- Loan Status Alerts --}}
+@if ((($stats['due_today_count'] ?? 0) + ($stats['overdue_count'] ?? 0) + ($stats['active_loans'] ?? 0)) > 0)
+                <div class="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl shadow-xl">
+                    <div class="flex items-center mb-3">
+                        <i class="bi bi-clipboard-data text-2xl text-gray-800"></i>
+                        <h4 class="ml-3 text-xl font-bold text-gray-900 mb-0">Status Pinjaman</h4>
+                    </div>
+                    @php
+                        $activeText = (($stats['active_loans'] ?? 0) > 0) ? (string)(($stats['active_loans'] ?? 0) . ' peminjaman aktif') : '';
+                        $dueText = (($stats['due_today_count'] ?? 0) > 0) ? (string)(($stats['due_today_count'] ?? 0) . ' jatuh tempo') : '';
+                        $overdueText = (($stats['overdue_count'] ?? 0) > 0) ? (string)(($stats['overdue_count'] ?? 0) . ' terlambat') : '';
+                        
+                        $allText = trim($activeText . ($activeText && $dueText ? ', ' : '') . $dueText . ($dueText && $overdueText ? ', ' : '') . $overdueText, ',');
+                    @endphp
+                    
+                    @if (!empty($allText))
+                        <div class="text-lg">
+                            <strong class="text-gray-900">{{ $allText }}</strong>
+                            <a href="{{ route('loans.active') }}?status=dipinjam" class="ml-3 text-blue-600 hover:text-blue-800 font-semibold underline">
+                                Lihat detail
+                            </a>
+                        </div>
+                    @endif
+                </div>
         @endif
 
         <div class="row g-4 mb-4">
@@ -58,8 +72,6 @@
                 </div>
             </div>
         </div>
-
-
 
         {{-- Top Borrowed Books Chart --}}
         <div class="row g-4 mb-4">
@@ -204,3 +216,4 @@
         </script>
     </div>
 @endsection
+
