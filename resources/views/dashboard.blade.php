@@ -9,29 +9,40 @@
         </h2>
 
         {{-- Loan Status Alerts --}}
-@if ((($stats['due_today_count'] ?? 0) + ($stats['overdue_count'] ?? 0) + ($stats['active_loans'] ?? 0)) > 0)
-                <div class="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl shadow-xl">
-                    <div class="flex items-center mb-3">
-                        <i class="bi bi-clipboard-data text-2xl text-gray-800"></i>
-                        <h4 class="ml-3 text-xl font-bold text-gray-900 mb-0">Status Pinjaman</h4>
-                    </div>
-                    @php
-                        $activeText = (($stats['active_loans'] ?? 0) > 0) ? (string)(($stats['active_loans'] ?? 0) . ' peminjaman aktif') : '';
-                        $dueText = (($stats['due_today_count'] ?? 0) > 0) ? (string)(($stats['due_today_count'] ?? 0) . ' jatuh tempo') : '';
-                        $overdueText = (($stats['overdue_count'] ?? 0) > 0) ? (string)(($stats['overdue_count'] ?? 0) . ' terlambat') : '';
-                        
-                        $allText = trim($activeText . ($activeText && $dueText ? ', ' : '') . $dueText . ($dueText && $overdueText ? ', ' : '') . $overdueText, ',');
-                    @endphp
-                    
-                    @if (!empty($allText))
-                        <div class="text-lg">
-                            <strong class="text-gray-900">{{ $allText }}</strong>
-                            <a href="{{ route('loans.active') }}?status=dipinjam" class="ml-3 text-blue-600 hover:text-blue-800 font-semibold underline">
-                                Lihat detail
-                            </a>
-                        </div>
-                    @endif
+        @if (($stats['due_today_count'] ?? 0) + ($stats['overdue_count'] ?? 0) + ($stats['active_loans'] ?? 0) > 0)
+            <div class="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl shadow-xl">
+                <div class="flex items-center mb-3">
+                    <i class="bi bi-clipboard-data text-2xl text-gray-800"></i>
+                    <h4 class="ml-3 text-xl font-bold text-gray-900 mb-0">Status Pinjaman</h4>
                 </div>
+                @php
+                    $statusParts = [];
+
+                    if (($stats['active_loans'] ?? 0) > 0) {
+                        $statusParts[] = ($stats['active_loans'] ?? 0) . ' peminjaman aktif';
+                    }
+
+                    if (($stats['due_today_count'] ?? 0) > 0) {
+                        $statusParts[] = ($stats['due_today_count'] ?? 0) . ' jatuh tempo';
+                    }
+
+                    if (($stats['overdue_count'] ?? 0) > 0) {
+                        $statusParts[] = ($stats['overdue_count'] ?? 0) . ' terlambat';
+                    }
+
+                    $allText = implode(', ', $statusParts) . '.';
+                @endphp
+
+                @if (!empty($allText))
+                    <div class="text-lg text-gray-700">
+                        <strong class="text-gray-900">{{ $allText }}</strong>
+                        <a href="{{ route('loans.active') }}?status=dipinjam"
+                            class=" text-blue-600 hover:text-blue-800 font-semibold underline">
+                            Lihat detail
+                        </a>
+                    </div>
+                @endif
+            </div>
         @endif
 
         <div class="row g-4 mb-4">
@@ -39,8 +50,8 @@
                 <div class="card h-100 text-center bg-primary text-white">
                     <div class="card-body">
                         <i class="bi bi-book fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title">{{ $stats['total_books'] ?? 0 }}</h3>
-                        <p class="card-text">Total Buku</p>
+                        <h3 class="card-title text-xl font-bold">{{ $stats['total_books'] ?? 0 }}</h3>
+                        <p class="card-text text-xl font-bold">Total Buku</p>
                     </div>
                 </div>
             </div>
@@ -48,17 +59,17 @@
                 <div class="card h-100 text-center bg-danger text-white">
                     <div class="card-body">
                         <i class="bi bi-exclamation-triangle fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title">{{ $stats['books_loaned'] ?? 0 }}</h3>
-                        <p class="card-text">Stok Rendah</p>
+                        <h3 class="card-title text-xl font-bold">{{ $stats['books_loaned'] ?? 0 }}</h3>
+                        <p class="card-text text-xl font-bold">Stok Rendah</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card h-100 text-center bg-warning text-white">
+                <div class="card h-100 text-center bg-secondary text-white">
                     <div class="card-body">
                         <i class="bi bi-clipboard-check fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title">{{ $stats['active_loans'] ?? 0 }}</h3>
-                        <p class="card-text">Pinjaman Aktif</p>
+                        <h3 class="card-title text-xl font-bold">{{ $stats['active_loans'] ?? 0 }}</h3>
+                        <p class="card-text text-xl font-bold">Pinjaman Aktif</p>
                     </div>
                 </div>
             </div>
@@ -66,8 +77,8 @@
                 <div class="card h-100 text-center bg-success text-white">
                     <div class="card-body">
                         <i class="bi bi-people fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title">{{ $stats['total_loans'] ?? 0 }}</h3>
-                        <p class="card-text">Total Transaksi</p>
+                        <h3 class="card-title text-xl font-bold">{{ $stats['total_loans'] ?? 0 }}</h3>
+                        <p class="card-text text-xl font-bold">Total Transaksi</p>
                     </div>
                 </div>
             </div>
@@ -216,4 +227,3 @@
         </script>
     </div>
 @endsection
-

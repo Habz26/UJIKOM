@@ -30,8 +30,9 @@
                             <div class="mb-4">
                                 <label class="form-label fw-bold fs-5">Pilih Buku</label>
                                 <div class="input-group input-group-lg">
-                                    <input list="books" id="book_title"
+<input id="book_title"
                                         class="form-control form-control-lg @error('book_id')is-invalid @enderror"
+
                                         placeholder="Ketik judul buku atau nama penulis untuk mencari..."
                                         value="" required autocomplete="off">
                                     <input type="hidden" name="book_id" id="hidden_book_id" value="{{ old('book_id') }}">
@@ -41,49 +42,141 @@
                                         <i class="bi bi-search"></i>
                                     </button>
                                 </div>
-                                <datalist id="books">
-                                    @foreach ($books as $book)
-                                        <option value="{{ $book->title }}" data-book-id="{{ $book->id }}"> oleh {{ $book->author }} |
+<datalist id="books" style="display: none;">
+@forelse($books as $book)
+    <option value="{{ $book->title }} - {{ $book->author }}" data-book-id="{{ $book->id }}">
+        {{ $book->title }} oleh {{ $book->author }}
+        {{ $book->year ? ' ('. $book->year .')' : '' }}
+        @if($book->publisher) - {{ $book->publisher }} @endif
+    </option>
+@empty
+    <option value="" disabled>Tidak ada buku dengan stok tersedia</option>
+@endforelse
+</datalist>
+<div id="book-dropdown" class="book-dropdown position-relative">
 
-                                            Stok: {{ $book->stock }}</option>
-                                    @endforeach
-                                </datalist>
+                                    <!-- Dynamic content -->
+                                </div>
                                 @error('book_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 
+                            <style>
+                                .book-dropdown {
+                                    max-height: 300px;
+                                }
+                                .book-dropdown-list {
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    right: 0;
+                                    background: white;
+                                    border: 1px solid #dee2e6;
+                                    border-radius: 0.375rem;
+                                    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                                    z-index: 1050;
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                    display: none;
+                                }
+                                .book-dropdown-item {
+                                    padding: 0.75rem 1rem;
+                                    cursor: pointer;
+                                    border-bottom: 1px solid #f8f9fa;
+                                    transition: background-color 0.15s ease;
+                                }
+                                .book-dropdown-item:hover {
+                                    background-color: #f8f9fa;
+                                }
+                                .book-dropdown-item:last-child {
+                                    border-bottom: none;
+                                }
+                                .no-results {
+                                    padding: 1rem;
+                                    color: #6c757d;
+                                    font-style: italic;
+                                }
+                            </style>
+
                             <script>
                                 const bookTitleInput = document.getElementById('book_title');
                                 const hiddenBookIdInput = document.getElementById('hidden_book_id');
+                                const dropdown = document.getElementById('book-dropdown');
+                                const dropdownList = dropdown.querySelector('.book-dropdown-list') || createDropdownList();
                                 
+                                let allBooks = [];
+
+                                // Store all books data on load
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    allBooks = Array.from(document.querySelectorAll('#books option')).map(option => ({
+                                        value: option.value,
+                                        bookId: option.dataset.bookId,
+                                        text: option.textContent
+                                    }));
+                                    updateDropdown('');
+                                });
+
+                                function createDropdownList() {
+                                    const list = document.createElement('div');
+                                    list.className = 'book-dropdown-list';
+                                    dropdown.appendChild(list);
+                                    return list;
+                                }
+
+                                function updateDropdown(filter = '') {
+                                    const filterLower = filter.toLowerCase();
+                                    let matching = allBooks.filter(book => 
+                                        book.text.toLowerCase().includes(filterLower)
+                                    );
+                                    
+                                    // Sort by relevance
+                                    matching.sort((a, b) => {
+                                        const aStarts = a.value.toLowerCase().startsWith(filterLower);
+                                        const bStarts = b.value.toLowerCase().startsWith(filterLower);
+                                        if (aStarts && !bStarts) return -1;
+                                        if (bStarts && !aStarts) return 1;
+                                        return 0;
+                                    });
+                                    
+                                    const list = dropdown.querySelector('.book-dropdown-list');
+                                    list.innerHTML = '';
+                                    
+                                    const top5 = matching.slice(0, 5);
+                                    
+                                    if (top5.length === 0) {
+                                        list.innerHTML = '<div class="no-results">Tidak ada buku ditemukan</div>';
+                                    } else {
+                                        top5.forEach(book => {
+                                            const item = document.createElement('div');
+                                            item.className = 'book-dropdown-item';
+                                            item.textContent = book.text;
+                                            item.dataset.bookId = book.bookId;
+                                            item.addEventListener('click', function() {
+                                                bookTitleInput.value = book.value;
+                                                hiddenBookIdInput.value = book.bookId;
+                                                dropdownList.style.display = 'none';
+                                            });
+                                            list.appendChild(item);
+                                        });
+                                    }
+                                    
+                                    dropdownList.style.display = bookTitleInput.value.length > 0 || document.activeElement === bookTitleInput ? 'block' : 'none';
+                                }
+
                                 bookTitleInput.addEventListener('input', function() {
-                                    const filter = this.value.toLowerCase();
-                                    const options = document.querySelectorAll('#books option');
-                                    options.forEach(option => {
-                                        const text = option.textContent.toLowerCase();
-                                        option.style.display = text.includes(filter) ? '' : 'none';
-                                    });
+                                    updateDropdown(this.value);
                                 });
-                                
-                                bookTitleInput.addEventListener('change', function() {
-                                    const selectedText = this.value;
-                                    const options = document.querySelectorAll('#books option');
-                                    let selectedId = null;
-                                    options.forEach(option => {
-                                        if (option.value === selectedText && option.dataset.bookId) {
-                                            selectedId = option.dataset.bookId;
-                                            return;
-                                        }
-                                    });
-                                    hiddenBookIdInput.value = selectedId || '';
-                                });
-                                
-                                // Show all on focus
+
                                 bookTitleInput.addEventListener('focus', function() {
-                                    this.setAttribute('list', 'books');
-                                    const event = new Event('input');
-                                    this.dispatchEvent(event);
+                                    updateDropdown(this.value);
+                                });
+
+                                // Hide dropdown on click outside
+                                document.addEventListener('click', function(e) {
+                                    if (!dropdown.contains(e.target) && e.target !== bookTitleInput) {
+                                        dropdownList.style.display = 'none';
+                                    }
                                 });
                             </script>
 

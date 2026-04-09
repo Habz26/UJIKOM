@@ -48,6 +48,8 @@
                             <th>Penulis</th>
                             <th>Tahun</th>
                             <th>Stok</th>
+                            <th>Penerbit</th>
+                            <th>Kategori</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -69,6 +71,8 @@
                                     {{ $book->stock }}
                                 </span>
                             </td>
+                            <td>{{ Str::limit($book->publisher ?? 'N/A', 20) }}</td>
+                            <td><span class="badge @if($book->category == 'Fiksi') bg-primary @elseif($book->category == 'Non-Fiksi') bg-secondary @elseif($book->category == 'Komputer') bg-warning text-dark @elseif($book->category == 'Pengembangan Diri') bg-success @elseif($book->category == 'Perpustakaan') bg-info @elseif($book->category == 'Sains Fiksi') bg-danger @elseif($book->category == 'Sejarah') bg-dark @else bg-light text-dark @endif">{{ $book->category ?? 'Tidak dikategorikan' }}</span></td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="prepareModal('edit', {{ $book->id }})">
                                     <i class="bi bi-pencil"></i>
@@ -84,7 +88,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">
+<td colspan="7" class="text-center py-4 text-muted">
                                 <i class="bi bi-book-x fs-1 d-block mb-2"></i>
                                 Belum ada data buku.
                             </td>
@@ -135,6 +139,27 @@
                             @error('stock') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Penerbit</label>
+                            <input type="text" name="publisher" id="publisher" class="form-control @error('publisher')is-invalid @enderror" required>
+                            @error('publisher') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kategori</label>
+                            <select name="category" id="category" class="form-select @error('category')is-invalid @enderror" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="Fiksi">Fiksi</option>
+                                <option value="Non-Fiksi">Non-Fiksi</option>
+                                <option value="Komputer">Komputer</option>
+                                <option value="Pengembangan Diri">Pengembangan Diri</option>
+                                <option value="Perpustakaan">Perpustakaan</option>
+                                <option value="Sains Fiksi">Sains Fiksi</option>
+                                <option value="Sejarah">Sejarah</option>
+                            </select>
+                            @error('category') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -160,6 +185,8 @@ function prepareModal(action, id = null) {
         document.getElementById('author').value = '';
         document.getElementById('year').value = '';
         document.getElementById('stock').value = '';
+        document.getElementById('publisher').value = '';
+        document.getElementById('category').value = '';
     } else {
         // Fetch book data via AJAX
         fetch(`/books/${id}`)
@@ -173,6 +200,8 @@ function prepareModal(action, id = null) {
                 document.getElementById('author').value = book.author;
                 document.getElementById('year').value = book.year;
                 document.getElementById('stock').value = book.stock;
+                document.getElementById('publisher').value = book.publisher || '';
+                document.getElementById('category').value = book.category || '';
                 title.textContent = 'Edit Buku';
             })
             .catch(error => console.error('Error:', error));

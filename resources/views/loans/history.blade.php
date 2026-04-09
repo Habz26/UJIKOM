@@ -20,6 +20,7 @@
                             <th class="text-center">Pinjam</th>
                             <th class="text-center">Estimasi</th>
                             <th class="text-center">Kembali</th>
+                            <th class="text-center">Terlambat</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Kondisi</th>
                             <th class="text-center">Catatan</th>
@@ -37,8 +38,21 @@
                                 <small class="text-muted">{{ $loan->book->author ?? '' }}</small>
                             </td>
                             <td class="text-center">{{ $loan->loan_date ? $loan->loan_date->format('d/m/Y') : '-' }}</td>
-                            <td class="text-center">{{ $loan->return_date?->format('d/m/Y') ?? '-' }}</td>
+                            <th class="text-center">{{ $loan->return_date?->format('d/m/Y') ?? '-' }}</td>
                             <td class="text-center">{{ $loan->returned_at ? $loan->returned_at->format('d/m/Y') : '-' }}</td>
+                            <td class="text-center">
+                                @php
+                                    $late_days = 0;
+                                    if ($loan->returned_at && $loan->return_date && $loan->returned_at > $loan->return_date) {
+                                        $late_days = $loan->returned_at->diffInDays($loan->return_date);
+                                    }
+                                @endphp
+                                @if($late_days > 0)
+                                    <span class="badge bg-danger">Terlambat {{ $late_days }} hari</span>
+                                @else
+                                    <span class="badge bg-success">Tepat waktu</span>
+                                @endif
+                            </td>
                             <td class="text-center">
                                 @php
                                     $dueDate = $loan->due_date ?? $loan->return_date ?? $loan->loan_date->copy()->addDays(7);
@@ -87,7 +101,7 @@
 
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="10" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                                 Belum ada riwayat peminjaman.
                             </td>

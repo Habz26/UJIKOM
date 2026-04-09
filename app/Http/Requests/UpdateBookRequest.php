@@ -24,6 +24,8 @@ class UpdateBookRequest extends FormRequest
             'author' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:'.date('Y'),
             'stock' => 'required|integer|min:0',
+            'publisher' => 'required|string|max:255',
+            'category' => 'required|string|max:100',
         ];
     }
 
@@ -36,6 +38,8 @@ class UpdateBookRequest extends FormRequest
             'year.integer' => 'Tahun harus berupa angka.',
             'stock.required' => 'Stok wajib diisi.',
             'stock.integer' => 'Stok harus berupa angka.',
+            'publisher.required' => 'Penerbit wajib diisi.',
+            'category.required' => 'Kategori wajib diisi.',
         ];
     }
 }
