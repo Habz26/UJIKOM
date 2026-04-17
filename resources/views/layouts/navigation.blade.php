@@ -74,6 +74,22 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="font-medium text-yellow-800 hover:text-yellow-900">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            
+            @if (auth()->user()->role === 'admin')
+                <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')" class="font-medium text-yellow-800 hover:text-yellow-900">
+                    Data Buku
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('members.index')" :active="request()->routeIs('members.*')" class="font-medium text-yellow-800 hover:text-yellow-900">
+                    Kelola Anggota
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" class="font-medium text-yellow-800 hover:text-yellow-900">
+                    Kategori
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('loans.create')" :active="request()->routeIs('loans.create')" class="font-medium text-yellow-800 hover:text-yellow-900">
+                    Pinjam Buku
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

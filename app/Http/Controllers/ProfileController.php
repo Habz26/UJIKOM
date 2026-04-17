@@ -16,8 +16,30 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $tab = $request->get('tab', 'info');
+        $search = $request->get('search');
+        
+        $categoriesData = app(\App\Http\Controllers\CategoryController::class)->index($request);
+        $categories = $categoriesData->getData()['categories'];
+        
         return view('profile.edit', [
             'user' => $request->user(),
+            'categories' => $categories,
+            'activeTab' => $tab,
+        ]);
+    }
+
+    /**
+     * Display category management (for profile tab).
+     */
+    public function categories(Request $request)
+    {
+        $controller = app(\App\Http\Controllers\CategoryController::class);
+        $view = $controller->index($request);
+        return view('profile.edit', [
+            'user' => $request->user(),
+            'categories' => $view->getData()['categories'],
+            'activeTab' => 'categories',
         ]);
     }
 
@@ -26,7 +48,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-$user = $request->user();
+        $user = $request->user();
         $user->fill($request->validated());
 
         if ($user->isDirty('email')) {

@@ -10,13 +10,16 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isAdmin = true; // Admin only
+
         $topBooks = Book::select('title')
             ->withCount('loans as loan_count')
             ->orderByDesc('loan_count')
             ->limit(5)
             ->get();
 
-        $activeLoans = Loan::with('book')
+        $activeLoans = Loan::with(['book', 'user'])
             ->where('status', 'dipinjam')
             ->latest()
             ->limit(10)
@@ -35,6 +38,30 @@ class DashboardController extends Controller
                 ->count(),
         ];
 
-        return view('dashboard', compact('stats', 'topBooks', 'activeLoans'));
+        return view('dashboard', compact('stats', 'topBooks', 'activeLoans', 'isAdmin'));
+    }
+
+    public function siswa(Request $request)
+    {
+        $user = auth()->user();
+        $isAdmin = false;
+
+        $userLoans = $user->loans()->with('book');
+        $topBooks = collect(); 
+        $activeLoans = $userLoans->where('status', 'dipinjam')->latest()->limit(10)->get();
+
+        $stats = [
+            'total_books' => null,
+            'books_loaned' => null,
+            'total_loans' => $userLoans->count(),
+            'active_loans' => $userLoans->where('status', 'dipinjam')->count(),
+            'overdue_count' => $userLoans->where('return_date', '<', now())
+                ->where('status', '!=', 'dikembalikan')->count(),
+            'due_today_count' => $userLoans->whereDate('return_date', now())
+                ->where('status', 'dipinjam')->count(),
+        ];
+
+        return view('dashboardsiswa', compact('stats', 'topBooks', 'activeLoans', 'isAdmin'));
     }
 }
+

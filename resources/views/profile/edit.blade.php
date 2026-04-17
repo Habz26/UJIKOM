@@ -14,7 +14,17 @@
                     </h2>
                     
                     <!-- Tabs -->
-                    <ul class="nav nav-tabs nav-fill mb-4" id="profileTabs" role="tablist">
+<ul class="nav nav-tabs nav-fill mb-4" id="profileTabs" role="tablist">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab') || '{{ $activeTab ?? "info" }}';
+            const tabButton = document.querySelector('[data-bs-target="#' + tab + '-tab-pane"]');
+            if (tabButton) {
+                tabButton.click();
+            }
+        });
+    </script>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab">
                                 <i class="bi bi-person me-1"></i> Profile Info
@@ -30,6 +40,13 @@
                                 <i class="bi bi-trash me-1"></i> Delete Account
                             </button>
                         </li>
+                        @if(auth()->user()->role === 'admin')
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-tab-pane" type="button" role="tab">
+                                <i class="bi bi-tags me-1"></i> Master Kategori
+                            </button>
+                        </li>
+                        @endif
                     </ul>
 
                     <!-- Tab Content -->
@@ -43,6 +60,11 @@
                         <div class="tab-pane fade" id="delete-tab-pane" role="tabpanel">
                             @include('profile.partials.delete-user-form')
                         </div>
+                        @if(auth()->user()->role === 'admin')
+                        <div class="tab-pane fade" id="categories-tab-pane" role="tabpanel">
+                            @include('profile.partials.category-management')
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

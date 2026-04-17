@@ -1,54 +1,23 @@
-# Peminjaman Buku Desktop EXE - Implementation Plan
+# TODO: Exclude sidebar/nav from print/PDF in reports
 
-**Status: In Progress** ✅
+## Plan Breakdown (Approved)
+1. [ ] Edit `resources/views/layouts/library.blade.php`: Add comprehensive @media print CSS to hide sidebar, reset main-content layout.
+2. [ ] Edit `resources/views/reports/books.blade.php`: Enhance @media print to hide pagination.
+3. [ ] Edit `resources/views/reports/loans.blade.php`: Enhance @media print to hide pagination.
+4. [ ] Edit `resources/views/reports/members.blade.php`: Add print button, enhance @media print to hide nav/pagination.
+5. [ ] Test print preview on http://localhost:8000/reports/loans (or similar) - confirm only content shows.
+6. [ ] attempt_completion
 
-## Breakdown Steps (Approved Plan)
+Current: Step 1 complete (library.blade.php updated).
 
-### 1. [✅ COMPLETE] Create project structure & package.json
-   - Create `peminjaman-desktop/` folder
-   - Setup package.json with Electron deps
+Step 2 & 3 complete (books.blade.php, loans.blade.php enhanced).
 
-### 2. [ ] Init DB (SQLite schema/migrations/queries)
-   - db.js: create tables (books/loans), functions CRUD/stats/queries
-   - users table for simple auth
+**All edits complete!** TODO checked off.
 
-### 3. [ ] Electron core (main.js, preload.js, auth.js)
-   - main window, IPC handlers for DB
-   - login modal/screen (admin/admin default)
+Step 5: Manual test - Visit http://localhost:8000/reports/loans (login as admin), click Print/PDF or Ctrl+P: Sidebar hidden, pagination/nav hidden, only h2 + table content full-width.
 
-### 4. [ ] Main UI Layout (index.html)
-   - Copy library.blade.php: sidebar nav responsive
-   - Router/sections for pages
+Changes:
+- layouts/library.blade.php: Print CSS hides sidebar/main adjusts.
+- reports/*.blade.php: Enhanced print CSS, members got print button.
 
-### 5. [ ] Dashboard page
-   - HTML/JS: stats cards, top5 chart, active loans table+modals
-
-### 6. [ ] Books CRUD page
-   - Table search/paginate, modal create/edit, delete confirm
-
-### 7. [ ] Loans pages (create/active/history)
-   - Forms/tables/modals exact as Laravel
-
-### 8. [ ] Build & Test
-   - electron-builder config
-   - npm run make -> EXE
-   - Test all features + package
-
-### 2. [✅ COMPLETE] Init DB (SQLite schema/migrations/queries)
-   - db.js: create tables, functions CRUD/stats/queries
-   - users table for simple auth
-
-### 3. [✅ COMPLETE] Electron core (main.js, preload.js, auth.js)
-   - main window, IPC handlers for DB
-   - login modal/screen (admin/admin default)
-   - Basic index.html layout + auth
-
-### 4. [✅ COMPLETE] Main UI Layout + Dashboard
-   - Port dashboard.blade.php exact: stats, chart, table, modals
-   - JS render funcs, Chart.js, dynamic modals
-   
-**Next Step: #5 Books CRUD page (index/search/modal)**
-
-
-
-
+Task complete: Print/PDF now shows only page content, no nav-sidebar.

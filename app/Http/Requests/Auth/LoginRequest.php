@@ -28,8 +28,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'email', 'regex:/^.+@(gmail\\.com|yahoo\\.com|outlook\\.com)$/i'],
+            'password' => ['required', 'string', new \App\Rules\StrongPassword()],
         ];
     }
 

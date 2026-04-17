@@ -20,7 +20,6 @@ class StoreLoanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'borrower_name' => 'required|string|max:255',
             'book_id' => 'required|exists:books,id',
             'loan_date' => 'required|date|before_or_equal:today',
             'return_date' => 'required|date|after:loan_date',
@@ -30,7 +29,6 @@ class StoreLoanRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'borrower_name.required' => 'Nama peminjam wajib diisi.',
             'book_id.required' => 'Buku wajib dipilih.',
             'loan_date.required' => 'Tanggal pinjam wajib diisi.',
             'return_date.after' => 'Tanggal kembali harus setelah tanggal pinjam.',

@@ -50,26 +50,18 @@
                 <div class="card h-100 text-center bg-primary text-white">
                     <div class="card-body">
                         <i class="bi bi-book fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title text-xl font-bold">{{ $stats['total_books'] ?? 0 }}</h3>
-                        <p class="card-text text-xl font-bold">Total Buku</p>
+<h3 class="card-title text-xl font-bold">{{ $stats['total_books'] ?? 0 }}</h3>
+                        <p class="card-text text-xl font-bold">@if($isAdmin) Total Buku @else Pinjaman Saya @endif</p>
                     </div>
                 </div>
             </div>
+            @if($isAdmin)
             <div class="col-md-3">
                 <div class="card h-100 text-center bg-danger text-white">
                     <div class="card-body">
                         <i class="bi bi-exclamation-triangle fs-1 mb-3 opacity-75"></i>
                         <h3 class="card-title text-xl font-bold">{{ $stats['books_loaned'] ?? 0 }}</h3>
                         <p class="card-text text-xl font-bold">Stok Rendah</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100 text-center bg-secondary text-white">
-                    <div class="card-body">
-                        <i class="bi bi-clipboard-check fs-1 mb-3 opacity-75"></i>
-                        <h3 class="card-title text-xl font-bold">{{ $stats['active_loans'] ?? 0 }}</h3>
-                        <p class="card-text text-xl font-bold">Pinjaman Aktif</p>
                     </div>
                 </div>
             </div>
@@ -82,8 +74,26 @@
                     </div>
                 </div>
             </div>
+            @endif
+            </div>
         </div>
 
+        @if(!$isAdmin)
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="text-center py-5 bg-light rounded-3">
+                        <i class="bi bi-book-half text-primary fs-1 mb-3 d-block"></i>
+                        <h3 class="display-6 text-primary mb-3">Mulai Pinjam Buku</h3>
+                        <p class="lead mb-4 text-muted">Pilih buku favorit Anda dan ajukan peminjaman sekarang!</p>
+                        <a href="{{ route('loans.create') }}" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-plus-circle me-2"></i>Pinjam Buku
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if($isAdmin)
         {{-- Top Borrowed Books Chart --}}
         <div class="row g-4 mb-4">
             <div class="col-12">
@@ -97,6 +107,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         {{-- Active Loans Verification --}}
         <div class="row g-4">
@@ -122,7 +133,7 @@
                                     @forelse($activeLoans as $loan)
                                         <tr>
                                             <td>{{ $loan->book->title ?? 'N/A' }}</td>
-                                            <td>{{ $loan->borrower_name }}</td>
+                                            <td>{{ $loan->user->name ?? $loan->borrower_name ?? 'N/A' }}</td>
                                             <td>{{ $loan->loan_date->format('Y-m-d') }}</td>
                                             <td>{{ $loan->return_date->format('Y-m-d') }}</td>
                                             <td>

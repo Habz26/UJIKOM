@@ -19,12 +19,18 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-bold fs-5">Nama Peminjam</label>
-                                <input type="text" name="borrower_name" value="{{ old('borrower_name') }}"
-                                    class="form-control form-control-lg @error('borrower_name')is-invalid @enderror"
-                                    placeholder="Masukkan nama lengkap peminjam" required>
-                                @error('borrower_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                @if(auth()->user()->role === 'siswa')
+                                    <input type="hidden" name="borrower_name" value="{{ auth()->user()->name }}">
+                                    <input type="text" value="{{ auth()->user()->name }}" class="form-control form-control-lg bg-light" readonly style="cursor: not-allowed;">
+                                    <small class="text-muted">Peminjaman atas nama Anda (siswa)</small>
+                                @else
+                                    <input type="text" name="borrower_name" value="{{ old('borrower_name') }}"
+                                        class="form-control form-control-lg @error('borrower_name')is-invalid @enderror"
+                                        placeholder="Masukkan nama lengkap peminjam" required>
+                                    @error('borrower_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                @endif
                             </div>
 
                             <div class="mb-4">

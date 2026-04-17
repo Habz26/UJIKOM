@@ -17,7 +17,7 @@ class BookController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Book::query();
+        $query = Book::with('kategori');
         
         if ($search = $request->get('search')) {
             $query->where('title', 'like', "%{$search}%")
@@ -26,8 +26,9 @@ class BookController extends Controller
         
         $search = $request->get('search');
         $books = $query->latest()->paginate(10);
+        $categories = \App\Models\Category::all();
         
-        return view('books.index', compact('books', 'search'));
+        return view('books.index', compact('books', 'search', 'categories'));
     }
 
     /**
@@ -43,7 +44,9 @@ class BookController extends Controller
      */
     public function create(): View
     {
-        return view('books.create');
+        $categories = \App\Models\Category::all();
+        
+        return view('books.create', compact('categories'));
     }
 
     /**

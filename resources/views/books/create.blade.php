@@ -49,17 +49,15 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Kategori</label>
-                                <select name="category" class="form-select form-select-lg @error('category')is-invalid @enderror" required>
+                                <select name="id_kategori" class="form-select form-select-lg @error('id_kategori')is-invalid @enderror" required>
                                     <option value="">Pilih Kategori</option>
-                                    <option value="Fiksi" {{ old('category') == 'Fiksi' ? 'selected' : '' }}>Fiksi</option>
-                                    <option value="Non-Fiksi" {{ old('category') == 'Non-Fiksi' ? 'selected' : '' }}>Non-Fiksi</option>
-                                    <option value="Komputer" {{ old('category') == 'Komputer' ? 'selected' : '' }}>Komputer</option>
-                                    <option value="Pengembangan Diri" {{ old('category') == 'Pengembangan Diri' ? 'selected' : '' }}>Pengembangan Diri</option>
-                                    <option value="Perpustakaan" {{ old('category') == 'Perpustakaan' ? 'selected' : '' }}>Perpustakaan</option>
-                                    <option value="Sains Fiksi" {{ old('category') == 'Sains Fiksi' ? 'selected' : '' }}>Sains Fiksi</option>
-                                    <option value="Sejarah" {{ old('category') == 'Sejarah' ? 'selected' : '' }}>Sejarah</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('id_kategori') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach 
                                 </select>
-                                @error('category') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                @error('id_kategori') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
                         

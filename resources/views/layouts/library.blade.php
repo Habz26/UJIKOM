@@ -20,6 +20,44 @@
             --sidebar-active: rgba(255, 255, 255, 0.2);
         }
 
+        @media print {
+            body { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                font-size: 12px !important; 
+                line-height: 1.4 !important;
+            }
+            .sidebar, .sidebar-toggle, .sidebar-overlay { 
+                display: none !important; 
+            }
+            .main-content { 
+                margin-left: 0 !important; 
+                margin: 0 !important; 
+                padding: 1rem !important; 
+                width: 100% !important;
+                min-height: auto !important;
+                background: white !important;
+            }
+            .container-fluid {
+                padding: 0 !important;
+            }
+            table { 
+                width: 100% !important; 
+                font-size: 11px !important;
+            }
+            .card { 
+                box-shadow: none !important; 
+                border: none !important; 
+                margin-bottom: 1rem !important;
+            }
+            .d-print-none { 
+                display: none !important; 
+            }
+            .pagination, nav[role="navigation"] {
+                display: none !important;
+            }
+        }
+
         .sidebar {
             min-height: 100vh;
             background: var(--sidebar-bg);
@@ -129,35 +167,42 @@
 
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link text-white @if (request()->routeIs('dashboard')) active @endif"
-                    href="{{ route('dashboard') }}">
+                <a class="nav-link text-white 
+                    @if(auth()->user()->role === 'admin' && request()->routeIs('dashboard')) active @elseif(auth()->user()->role === 'siswa' && request()->routeIs('dashboard.siswa')) active @endif"
+                    href="{{ auth()->user()->role === 'admin' ? route('dashboard') : route('dashboard.siswa') }}">
                     <i class="bi bi-house-door fs-5 me-3"></i> Dashboard
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link text-white @if (request()->routeIs('books.*')) active @endif"
                     href="{{ route('books.index') }}">
                     <i class="bi bi-book fs-5 me-3"></i> Data Buku
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link text-white @if (request()->routeIs('loans.create')) active @endif"
                     href="{{ route('loans.create') }}">
                     <i class="bi bi-clipboard-check fs-5 me-3"></i> Peminjaman
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link text-white @if (request()->routeIs('loans.active')) active @endif"
                     href="{{ route('loans.active') }}">
                     <i class="bi bi-clock fs-5 me-3"></i> Pinjaman Aktif
                 </a>
             </li>
+
+            @if(auth()->user()->role === 'admin')
             <li class="nav-item">
-                <a class="nav-link text-white @if (request()->routeIs('loans.history')) active @endif"
-                    href="{{ route('loans.history') }}">
-                    <i class="bi bi-clock-history fs-5 me-3"></i> Riwayat
+                <a class="nav-link text-white @if (request()->routeIs('reports.*')) active @endif"
+                    href="{{ route('reports.index') }}">
+                    <i class="bi bi-bar-chart fs-5 me-3"></i> Laporan
                 </a>
             </li>
+            @endif
             <li class="nav-item">
                 <a class="nav-link text-white @if (request()->routeIs('profile.edit')) active @endif"
                     href="{{ route('profile.edit') }}">

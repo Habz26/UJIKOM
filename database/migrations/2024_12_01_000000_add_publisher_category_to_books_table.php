@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('books', function (Blueprint $table) {
             $table->string('publisher')->after('year');
-            $table->string('category')->after('publisher');
+// $table->string('category')->after('publisher'); // Deprecated, use id_kategori instead
+$table->foreignId('id_kategori')->nullable()->after('publisher')
+    ->onDelete('set null');
         });
     }
 
@@ -23,7 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn(['publisher', 'category']);
+$table->dropForeign(['id_kategori']);
+$table->dropColumn(['publisher', 'id_kategori', 'category']);
         });
     }
 };

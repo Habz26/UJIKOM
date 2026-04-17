@@ -8,16 +8,29 @@ use App\Models\Loan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class LoanController extends Controller
 {
     /**
-     * Show form for new loan.
+     * Show form for new loan.kw
      */
     public function create(): View
     {
-        $books = Book::where('stock', '>', 0)->get();
-        return view('loans.create', compact('books'));
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+        
+        $booksQuery = Book::where('stock', '>', 0);
+        if (!$isAdmin) {
+            // Siswa only see available books not already borrowed by them
+            $booksQuery->whereDoesntHave('loans', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->where('status', 'dipinjam');
+            });
+        }
+        
+        $books = $booksQuery->withTrashed(false)->get();
+        return view('loans.create', compact('books', 'isAdmin'));
     }
 
     /**
@@ -25,16 +38,40 @@ class LoanController extends Controller
      */
     public function store(StoreLoanRequest $request): RedirectResponse
     {
-$loanData = $request->validated();
+        $userId = auth()->id();
+        $bookId = $request->input('book_id');
+        if (!$bookId) {
+            return back()->withErrors(['book_id' => 'Buku harus dipilih'])->withInput();
+        }
         
-        $loan = Loan::create($loanData);
-        
-        // Update book stock
-        $book = Book::find($request->book_id);
-        $book->decrement('stock');
+        DB::transaction(function () use ($userId, $bookId, $request) {
+            // Check stock
+            $book = Book::findOrFail($bookId);
+            if ($book->stock <= 0) {
+                throw new \Exception('Stok buku habis');
+            }
+            
+            // Check duplicate for siswa
+            if (auth()->user()->role === 'siswa') {
+                $existing = Loan::where('user_id', $userId)
+                    ->where('book_id', $bookId)
+                    ->where('status', 'dipinjam')
+                    ->exists();
+                if ($existing) {
+                    throw new \Exception('Anda sudah meminjam buku ini!');
+                }
+            }
+            
+            $loanData = $request->validated();
+            $loanData['user_id'] = $userId;
+            $loanData['borrower_name'] = $loanData['borrower_name'] ?? auth()->user()->name;
+            $loan = Loan::create($loanData);
+            
+            $book->decrement('stock');
+        });
         
         return redirect()->route('loans.active')
-            ->with('success', 'Peminjaman berhasil dicatat! Jatuh tempo: ' . $loan->return_date->format('d/m/Y'));
+            ->with('success', 'Peminjaman berhasil! Jatuh tempo: ' . date('d/m/Y', strtotime($request->return_date)));
     }
 
 
@@ -47,24 +84,23 @@ public function return(Loan $loan): RedirectResponse
         return back()->with('error', 'Peminjaman sudah dikembalikan.');
     }
 
-    $dueDate = $loan->return_date ?? $loan->loan_date->copy()->addDays(7);
-    $isOverdue = now()->gt($dueDate);
+    DB::transaction(function () use ($loan) {
+        $dueDate = $loan->return_date ?? $loan->loan_date->copy()->addDays(7);
+        $lateDays = now()->gt($dueDate) ? floor(now()->diffInDays($dueDate)) : 0;
+        $fine = $lateDays * 1000; // Rp1000/hari
 
-    $lateDays = 0;
-    if ($isOverdue) {
-        $lateDays = floor($dueDate->diffInSeconds(now()) / 86400);
-    }
+        $loan->update([
+            'returned_at' => now(),
+            'status' => 'dikembalikan',
+            'fine' => $fine,
+        ]);
 
-    $lateNote = $lateDays > 0 ? ' (TERLAMBAT ' . $lateDays . ' hari)' : '';
+        $loan->book->increment('stock');
+    });
 
-    $loan->update([
-        'returned_at' => now(),
-        'status' => 'dikembalikan'
-    ]);
-
-    $loan->book->increment('stock');
-
-    return back()->with('success', 'Buku berhasil dikembalikan!' . $lateNote);
+    $fineNote = $loan->fine > 0 ? ' (Denda: Rp' . number_format($loan->fine) . ')' : '';
+    
+    return back()->with('success', 'Buku berhasil dikembalikan!' . $fineNote);
 }
 
     /**
@@ -72,20 +108,27 @@ public function return(Loan $loan): RedirectResponse
      */
     public function active(Request $request): View
     {
-        $overdueLoans = Loan::where('status', 'dipinjam')
-            ->where('loan_date', '<=', now()->subDays(7))
-            ->count();
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
 
-        $query = Loan::with('book')
-            ->where('status', 'dipinjam')
-            ->when($request->filled('status') && $request->status === 'terlambat', function ($q) {
-                $q->where('loan_date', '<=', now()->subDays(7));
-            })
-            ->latest();
-        
+        $query = Loan::with(['book', 'user'])
+            ->where('status', 'dipinjam');
+
+        if (!$isAdmin) {
+            $query->where('user_id', $user->id);
+        }
+
+        $query->when($request->filled('status') && $request->status === 'terlambat', function ($q) {
+            $q->where('return_date', '<', now());
+        })->latest();
+
         $loans = $query->paginate(10);
-        
-        return view('loans.active', compact('loans', 'overdueLoans'));
+
+        $overdueLoans = $isAdmin 
+            ? $query->cloneWithout(['orders', 'limit'])->where('return_date', '<', now())->count()
+            : $loans->where('return_date', '<', now())->count();
+
+        return view('loans.active', compact('loans', 'overdueLoans', 'isAdmin'));
     }
 
     /**
@@ -93,13 +136,19 @@ public function return(Loan $loan): RedirectResponse
      */
     public function history(Request $request): View
     {
-        $query = Loan::with('book')
-            ->where('status', 'dikembalikan')
-            ->latest();
-        
-        $loans = $query->paginate(10);
-        
-        return view('loans.history', compact('loans'));
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+
+        $query = Loan::with(['book', 'user'])
+            ->where('status', 'dikembalikan');
+
+        if (!$isAdmin) {
+            $query->where('user_id', $user->id);
+        }
+
+        $loans = $query->latest()->paginate(10);
+
+        return view('loans.history', compact('loans', 'isAdmin'));
     }
 
     /**

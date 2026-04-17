@@ -35,7 +35,7 @@
                         <tbody>
                             @forelse($loans as $loan)
                                 <tr @if ($loan->loan_date <= now()->subDays(7)) class="table-danger" @endif>
-                                    <td>{{ Str::limit($loan->borrower_name, 30) }}</td>
+                                    <td>{{ $isAdmin ? ($loan->user->name ?? $loan->borrower_name) : auth()->user()->name }}</td>
                                     <td>
                                         <strong>{{ Str::limit($loan->book->title ?? 'N/A', 30) }}</strong><br>
                                         <small>{{ $loan->book->author ?? '' }}</small>
