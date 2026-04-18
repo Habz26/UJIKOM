@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
     // All roles loans view (with internal role checks)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('books', BookController::class)->only(['index', 'show']);
+    Route::get('/loans', [LoanController::class, 'history'])->name('loans.history');
     Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
     Route::get('/loans/active', [LoanController::class, 'active'])->name('loans.active');
