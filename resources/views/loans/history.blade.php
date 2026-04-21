@@ -100,7 +100,7 @@
                                         @if($loan->fine > 0)
                                             <span class="badge bg-danger fs-6">Rp {{ number_format($loan->fine) }}</span>
                                         @else
-                                            <span class="badge bg-success fs-6">Gratis</span>
+                                            <span class="badge bg-success fs-6">TIDAK ADA</span>
                                         @endif
                                     </td>
                                     <td>

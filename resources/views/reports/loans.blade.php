@@ -67,7 +67,7 @@
                                     </div>
                                 @else
                                     <div style="min-width:70px;">
-                                        <span class="badge bg-success w-100 fs-6 d-block mx-auto" style="display:table;">GRATIS</span>
+                                        <span class="badge bg-success w-100 fs-6 d-block mx-auto" style="display:table;">TIDAK ADA</span>
                                     </div>
                                 @endif
                             <td class="text-center">
