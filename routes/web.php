@@ -20,9 +20,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/categories', [ProfileController::class, 'categories'])->name('profile.categories');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    });
-    
-    // Admin routes
+});
+
+// Admin routes
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('books', BookController::class);
@@ -39,9 +39,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 // Siswa routes
 Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
     Route::get('/dashboardsiswa', [DashboardController::class, 'siswa'])->name('dashboard.siswa');
-    });
-    
-    // All roles loans view (with internal role checks)
+});
+
+// All roles loans view (with internal role checks)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('books', BookController::class)->only(['index', 'show']);
     Route::get('/loans', [LoanController::class, 'history'])->name('loans.history');
@@ -49,6 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
     Route::get('/loans/active', [LoanController::class, 'active'])->name('loans.active');
     Route::patch('/loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
-    Route::patch('/loans/{loan}/condition', [LoanController::class, 'updateCondition'])->name('loans.update-condition');
+    Route::patch('/loans/{loan}/verify', [LoanController::class, 'verifyReturn'])->name('loans.verify');
+    Route::patch('/loans/{loan}/condition', [LoanController::class, 'verifyReturn'])->name('loans.update-condition'); // Legacy
+    Route::post('/loans/{loan}/pay-fine', [LoanController::class, 'payFine'])->name('loans.pay-fine');
 });
 require __DIR__.'/auth.php';
+

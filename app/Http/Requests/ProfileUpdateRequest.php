@@ -10,9 +10,9 @@ use Illuminate\Validation\Rule;
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Get the validation rules that apply to the request.
+     * Aturan validasi untuk update profil user (name, email unique ignore self, photo upload).
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, array|string> Rules lengkap untuk profil
      */
     public function rules(): array
     {
@@ -26,6 +26,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

@@ -53,6 +53,10 @@
                                     <th>Peminjam</th>
                                 @endif
                                 <th>Buku</th>
+<th>Jumlah Pinjam</th>
+<th>Dikembalikan</th>
+                                <th>Sisa</th>
+                                <th>Status Verif</th>
                                 <th>Tgl Pinjam</th>
                                 <th>Tgl Jatuh Tempo</th>
                                 <th>Tgl Dikembalikan</th>
@@ -63,7 +67,7 @@
                         <tbody>
                             @forelse($loans as $loan)
                                 <tr>
-                                    @if($isAdmin)
+@if($isAdmin)
                                         <td>
                                             <strong>{{ $loan->user->name ?? $loan->borrower_name ?? 'N/A' }}</strong>
                                             @if($loan->user)
@@ -77,11 +81,23 @@
                                             <br><small class="text-muted">Kategori: {{ $loan->book->kategori->name }}</small>
                                         @endif
                                     </td>
+                                    <td>{{ $loan->borrowed_quantity }}</td>
+                                    <td>{{ $loan->returned_quantity }}</td>
+                                    <td>{{ $loan->quantity }}</td>
+                                    <td>
+                                        @if($loan->verification_status === 'pending')
+                                            <span class="badge bg-warning">Pending</span>
+                                        @elseif($loan->verification_status === 'verified_returned')
+                                            <span class="badge bg-success">Terverifikasi</span>
+                                        @else
+                                            <span class="badge bg-secondary">-</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $loan->loan_date->format('d/m/Y') }}</td>
                                     <td>{{ $loan->return_date->format('d/m/Y') }}</td>
-                                    <td>{{ $loan->returned_at ? $loan->returned_at->format('d/m/Y H:i') : '-' }}</td>
+                                    <td>{{ $loan->returned_at ? $loan->returned_at->format('d/m/Y') : '-' }}</td>
                                     <td>
-                                        @if($loan->fine < 0)
+                                        @if($loan->fine > 0)
                                             <span class="badge bg-danger fs-6">Rp {{ number_format($loan->fine) }}</span>
                                         @else
                                             <span class="badge bg-success fs-6">Gratis</span>

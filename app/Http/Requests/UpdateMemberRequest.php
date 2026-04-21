@@ -7,11 +7,21 @@ use Illuminate\Validation\Rule;
 
 class UpdateMemberRequest extends FormRequest
 {
+    /**
+     * Menentukan apakah request ini diizinkan (selalu true untuk update member).
+     *
+     * @return bool Selalu true
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Aturan validasi untuk update member (email unique ignore current ID, password nullable).
+     *
+     * @return array<string, array|string> Rules untuk name, email (unique ignore), role, password nullable
+     */
     public function rules(): array
     {
         return [
@@ -22,6 +32,11 @@ class UpdateMemberRequest extends FormRequest
         ];
     }
 
+    /**
+     * Pesan error custom dalam bahasa Indonesia.
+     *
+     * @return array<string, string> Pesan untuk email.unique dan password.confirmed
+     */
     public function messages(): array
     {
         return [

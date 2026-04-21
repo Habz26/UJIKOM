@@ -77,18 +77,18 @@
                                 <tr>
                                     <td>{!! highlight(Str::limit($book->title, 40), $search ?? '') !!}</td>
                                     <td>{!! highlight(Str::limit($book->author, 30), $search ?? '') !!}</td>
-                                    <td>{{ $book->year }}</td>
+                                    <td>{!! highlight($book->year, $search ?? '') !!}</td>
                                     <td>
                                         <span class="badge {{ $book->stock > 0 ? 'bg-success' : 'bg-danger' }}">
-                                            {{ $book->stock }}
+                                            {!! highlight($book->stock, $search ?? '') !!}
                                         </span>
                                     </td>
-                                    <td>{{ Str::limit($book->publisher ?? 'N/A', 20) }}</td>
-                                    <td>
+                                    <td>{!! highlight(Str::limit($book->publisher ?? 'N/A', 20), $search ?? '') !!}</td>
+                                        <td>
                                         @if ($book->kategori)
-                                            <span class="badge bg-primary">{{ $book->kategori->name }}</span>
+                                            <span class="badge bg-primary">{!! highlight($book->kategori->name, $search ?? '') !!}</span>
                                         @else
-                                            <span class="badge bg-secondary">Tidak dikategorikan</span>
+                                            <span class="badge bg-secondary">{!! highlight('Tidak dikategorikan', $search ?? '') !!}</span>
                                         @endif
                                     </td>
                                     @if(auth()->user()->role === 'admin')

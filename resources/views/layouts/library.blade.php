@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-:root {
+        :root {
             --sidebar-width: 340px;
             --sidebar-bg: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
             --sidebar-active: rgba(255, 255, 255, 0.2);
@@ -92,6 +92,7 @@
         .sidebar ul li {
             margin-bottom: 0.5rem;
         }
+
         .sidebar ul li:last-child {
             margin-bottom: 1rem;
         }
@@ -184,7 +185,7 @@
         }
 
         .header-title {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -194,6 +195,7 @@
             margin: 0;
         }
 
+
         .school-name {
             font-size: 0.85rem;
             font-weight: 500;
@@ -201,13 +203,84 @@
             margin: 0 0 0.25rem 0;
         }
 
+        /* User Profile Styles */
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-icon {
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .user-profile-section {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+        }
+
+
+        .user-profile-section:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* Ensure fixed profile section width to sidebar edge */
+        .user-profile-section {
+            width: calc(var(--sidebar-width) - 2rem);
+            max-width: calc(var(--sidebar-width) - 2rem);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+
+        /* Long name handling - wrap to multiple lines without overflow */
+        .user-info>div:first-child {
+            max-height: 2.4em;
+            /* ~2 lines at 1.2 line-height */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 576px) {
+            .user-info>div:first-child {
+                font-size: 0.8rem !important;
+                max-height: 2.2em;
+                -webkit-line-clamp: 2;
+            }
+
+            .user-info small {
+                font-size: 0.7rem !important;
+            }
+        }
+
+
+
         /* Header container - minimal overrides */
-        #sidebar > .d-flex {
+        #sidebar>.d-flex {
             gap: 1rem;
             align-items: flex-start;
         }
 
-        #sidebar > .d-flex > .flex-column {
+        #sidebar>.d-flex>.flex-column {
             flex: 1;
             min-width: 0;
             flex-direction: column !important;
@@ -216,7 +289,7 @@
             gap: 0.25rem;
         }
 
-        #sidebar > .d-flex .d-flex.align-items-center {
+        #sidebar>.d-flex .d-flex.align-items-center {
             flex-wrap: nowrap;
             gap: 0.5rem;
         }
@@ -247,6 +320,7 @@
 
     <!-- Sidebar -->
     <nav class="sidebar bg-primary text-white p-3" id="sidebar">
+
         <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
             <div class="card-header-brand p-3 rounded-3 shadow-sm border-0 d-flex align-items-start gap-3">
                 <i class="bi bi-book-half header-icon mt-1 flex-shrink-0"></i>
@@ -257,6 +331,29 @@
             </div>
         </div>
 
+        <!-- User Profile Section -->
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom">
+            <div class="user-profile-section mb-4 p-3 rounded-3 shadow-sm border-0 bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-25 d-flex align-items-center gap-3">
+                <div class="profile-avatar flex-shrink-0">
+                    <img src="{{ auth()->user()->photo_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle"
+                        width="48" height="48"
+                        onerror="this.nextElementSibling.style.display='flex'; this.style.display='none';">
+                    <i class="bi bi-person-circle profile-icon d-flex align-items-center justify-content-center"
+                        style="display: none;"></i>
+                </div>
+
+                <div class="user-info flex-grow-1 min-width-0">
+                    <div class="text-white mb-0"
+                        style="font-size: 0.9rem; line-height: 1.2; word-break: break-word; overflow-wrap: break-word; max-height: 2.4em; overflow: hidden;"
+                        title="{{ auth()->user()->name }}">
+                        {{ auth()->user()->name }}
+                    </div>
+                    <small class="text-white-50 mb-0"
+                        style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->role) }}</small>
+                </div>
+
+            </div>
+        </div>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link text-white 
@@ -293,6 +390,15 @@
                     <i class="bi bi-clock-history fs-5 me-3"></i> Riwayat Peminjaman
                 </a>
             </li>
+
+            @if (auth()->user()->role === 'admin')
+                <li class="nav-item">
+                    <a class="nav-link text-white @if (request()->routeIs('users.*')) active @endif"
+                        href="{{ route('members.index') }}">
+                        <i class="bi bi-people fs-5 me-3"></i> Manajemen Pengguna
+                    </a>
+                </li>
+            @endif
 
             @if (auth()->user()->role === 'admin')
                 <li class="nav-item">

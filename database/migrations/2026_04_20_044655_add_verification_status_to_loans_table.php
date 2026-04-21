@@ -6,22 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::table('loans', function (Blueprint $table) {
-$table->foreignId('user_id')->constrained('users')->onDelete('cascade')->after('id');
-            $table->unsignedInteger('quantity')->default(1)->after('book_id');
-            $table->decimal('fine', 10, 2)->default(0)->after('returned_at');
-            $table->softDeletes();
+            //
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('loans', function (Blueprint $table) {
-$table->dropForeign(['user_id']);
-            $table->dropColumn(['user_id', 'quantity', 'fine', 'deleted_at']);
+            //
         });
     }
 };
-

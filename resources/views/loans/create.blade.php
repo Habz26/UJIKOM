@@ -187,8 +187,16 @@
                             </script>
 
 
-                            <div class="row g-4 mb-5">
-                                <div class="col-md-6">
+        <div class="row g-4 mb-5">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold fs-5">Jumlah Eksemplar</label>
+                                    <input type="number" name="quantity" value="1" min="1" max="10" class="form-control form-control-lg @error('quantity')is-invalid @enderror" required>
+                                    @error('quantity')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Maksimal 10 eksemplar per peminjaman</small>
+                                </div>
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold fs-5">Tanggal Pinjam</label>
                                     <input type="date" name="loan_date" value="{{ old('loan_date') }}"
                                         class="form-control form-control-lg @error('loan_date')is-invalid @enderror"
@@ -197,7 +205,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold fs-5">Tanggal Kembali (Estimasi)</label>
                                     <input type="date" name="return_date" value="{{ old('return_date') }}"
                                         class="form-control form-control-lg @error('return_date')is-invalid @enderror"

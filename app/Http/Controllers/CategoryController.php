@@ -11,7 +11,10 @@ use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of categories.
+     * Menampilkan daftar kategori dengan filter pencarian nama.
+     *
+     * @param Request $request Parameter 'search' untuk filter nama kategori
+     * @return View Partial view category-management dengan data paginasi
      */
     public function index(Request $request): View
     {

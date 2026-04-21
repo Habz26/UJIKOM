@@ -9,18 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('loans', function (Blueprint $table) {
-$table->foreignId('user_id')->constrained('users')->onDelete('cascade')->after('id');
-            $table->unsignedInteger('quantity')->default(1)->after('book_id');
-            $table->decimal('fine', 10, 2)->default(0)->after('returned_at');
-            $table->softDeletes();
+            $table->unsignedInteger('borrowed_quantity')->default(0)->after('quantity');
+            $table->unsignedInteger('returned_quantity')->default(0)->after('borrowed_quantity');
         });
     }
 
     public function down(): void
     {
         Schema::table('loans', function (Blueprint $table) {
-$table->dropForeign(['user_id']);
-            $table->dropColumn(['user_id', 'quantity', 'fine', 'deleted_at']);
+            $table->dropColumn(['borrowed_quantity', 'returned_quantity']);
         });
     }
 };

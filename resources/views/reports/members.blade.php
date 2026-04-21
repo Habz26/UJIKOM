@@ -4,45 +4,56 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h2 class="mb-3">
-                    <i class="bi bi-people me-2 text-info"></i>
-                    Laporan Anggota Perpustakaan
-                </h2>
-                <p class="text-muted">Total anggota: <strong>{{ number_format($members->count()) }}</strong></p>
-            </div>
-            <div class="col-md-6 text-end">
-                <div class="d-print-none mb-3">
-                    <button onclick="window.print()" class="btn btn-success me-2">
-                        <i class="bi bi-printer me-1"></i>Print / PDF
-                    </button>
-                </div>
-                <form method="GET" action="{{ route('reports.members') }}" class="d-inline">
-                    <div class="input-group input-group-sm" style="max-width: 300px;">
-                        <input type="text" name="search" class="form-control" placeholder="Cari nama atau email..."
-                            value="{{ request('search') }}">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <h2 class="mb-4">
+            <i class="bi bi-people me-2 text-info"></i>
+            Laporan Anggota Perpustakaan
+        </h2>
+        <p class="text-muted mb-3">Total anggota: <strong>{{ number_format($members->total()) }}</strong></p>
+        <div class="d-print-none mb-4">
+            <button onclick="window.print()" class="btn btn-success me-2">
+                <i class="bi bi-printer me-1"></i>Print / PDF
+            </button>
+            <a href="{{ route('reports.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Kembali
+            </a>
         </div>
+
+        @php $search = request('search'); @endphp
+
+        <form method="GET" action="{{ route('reports.members') }}" class="mb-4">
+            <div class="input-group input-group-sm" style="max-width: 400px;">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama atau email..."
+                    value="{{ $search }}">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+                @if($search)
+                    <a href="{{ route('reports.members') }}" class="btn btn-outline-secondary">Reset</a>
+                @endif
+            </div>
+        </form>
+
+        @php
+            function highlight($text, $term) {
+                if (!$term) {
+                    return $text;
+                }
+                $pattern = '/(' . preg_quote($term, '/') . ')/i';
+                return preg_replace($pattern, '<mark class="bg-warning text-dark fw-bold">$1</mark>', $text);
+            }
+        @endphp
 
         <style>
         @media print {
             .d-print-none { display: none !important; }
-            .card { box-shadow: none !important; border: none !important; }
-            table { font-size: 11px; }
+            .card { box-shadow: none !important; }
+            table { font-size: 12px; }
             .avatar-img { display: none !important; }
-            .btn { display: none !important; }
             .pagination, nav[role="navigation"] { display: none !important; }
-            .alert { display: none !important; }
         }
         </style>
 
-        <div class="card shadow-sm border-0">
+        <div class="card shadow">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
@@ -70,21 +81,21 @@
                                                     alt="{{ $member->name }}" class="avatar-img rounded-circle">
                                             </div>
                                             <div>
-                                                <strong>{{ $member->name }}</strong>
+                                                <strong>{!! highlight($member->name, $search ?? '') !!}</strong>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ $member->email }}</td>
+                                    <td>{!! highlight($member->email, $search ?? '') !!}</td>
                                     <td>
                                         <span class="badge {{ $member->role === 'admin' ? 'bg-danger' : 'bg-info' }}">
-                                            {{ ucfirst($member->role) }}
+                                            {!! highlight(ucfirst($member->role), $search ?? '') !!}
                                         </span>
                                     </td>
                                     <td>
                                         <span class="badge bg-primary">{{ $member->loans_count ?? 0 }}</span>
                                     </td>
-                                    <td>Rp {{ number_format($member->total_fine ?? 0, 0, ',', '.') }}</td>
-                                    <td>{{ $member->last_login ? $member->last_login->format('d/m/Y H:i') : '-' }}</td>
+                                    <td>Rp {{ number_format($member->total_outstanding ?? 0, 0, ',', '.') }}</td>
+                                    <td>{!! highlight(($member->last_activity ? \Carbon\Carbon::parse($member->last_activity)->format('d/m/Y H:i') : '-'), $search ?? '') !!}</td>
                                     <td>
                                         <span class="badge bg-success">Aktif</span>
                                     </td>
@@ -110,9 +121,9 @@
                     </table>
                 </div>
                 @if ($members->hasPages())
-                    <nav class="bg-light p-3">
+                    <div class="card-footer bg-transparent">
                         {{ $members->appends(request()->query())->links() }}
-                    </nav>
+                    </div>
                 @endif
             </div>
         </div>

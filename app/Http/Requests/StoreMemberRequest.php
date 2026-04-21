@@ -6,11 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMemberRequest extends FormRequest
 {
+    /**
+     * Menentukan apakah request ini diizinkan (selalu true untuk store member).
+     *
+     * @return bool Selalu true
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Aturan validasi untuk pembuatan member baru.
+     *
+     * @return array<string, string> Rules untuk name, email (unique), password (confirmed), role
+     */
     public function rules(): array
     {
         return [
@@ -21,6 +31,11 @@ class StoreMemberRequest extends FormRequest
         ];
     }
 
+    /**
+     * Pesan error custom dalam bahasa Indonesia.
+     *
+     * @return array<string, string> Pesan untuk email.unique dan password.confirmed
+     */
     public function messages(): array
     {
         return [
